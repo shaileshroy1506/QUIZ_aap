@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fun Quiz Time!</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div class="progress-bar">
+        <div id="progress" class="progress-fill"></div>
+      </div>
+      <h2 id="question">Ready for your first question?</h2>
+      <ul>
+        <li>
+          <input type="radio" name="answer" id="a" class="answer" />
+          <label for="a" id="a_text">Answer A</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="b" class="answer" />
+          <label for="b" id="b_text">Answer B</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="c" class="answer" />
+          <label for="c" id="c_text">Answer C</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="d" class="answer" />
+          <label for="d" id="d_text">Answer D</label>
+        </li>
+      </ul>
+    </div>
+    <button id="submit">Submit Answer</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
