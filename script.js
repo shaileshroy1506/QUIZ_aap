@@ -1,101 +1,132 @@
-const quizData = [
+const questions = [
   {
-    question: "Hey! What’s the capital city of India?",
-    a: "Mumbai",
-    b: "New Delhi",
-    c: "Kolkata",
-    d: "Chennai",
-    correct: "b"
+    question: "Which language runs in a web browser?",
+    answers: [
+      { text: "Java", correct: false },
+      { text: "C", correct: false },
+      { text: "Python", correct: false },
+      { text: "JavaScript", correct: true }
+    ]
   },
   {
-    question: "Which language is used to make web pages interactive?",
-    a: "Java",
-    b: "C",
-    c: "Python",
-    d: "JavaScript",
-    correct: "d"
+    question: "What does CSS stand for?",
+    answers: [
+      { text: "Central Style Sheets", correct: false },
+      { text: "Cascading Style Sheets", correct: true },
+      { text: "Cascading Simple Sheets", correct: false },
+      { text: "Cars SUVs Sailboats", correct: false }
+    ]
   },
   {
-    question: "Do you know what CSS stands for?",
-    a: "Central Style Sheets",
-    b: "Cascading Style Sheets",
-    c: "Cascading Simple Sheets",
-    d: "Cars SUVs Sailboats",
-    correct: "b"
+    question: "What does HTML stand for?",
+    answers: [
+      { text: "Hypertext Markup Language", correct: true },
+      { text: "Hyperloop Machine Language", correct: false },
+      { text: "Helicopters Terminals Motorboats Lamborghinis", correct: false },
+      { text: "None of the above", correct: false }
+    ]
   },
   {
-    question: "When did JavaScript first appear?",
-    a: "1996",
-    b: "1995",
-    c: "1994",
-    d: "Not sure",
-    correct: "b"
+    question: "What year was JavaScript launched?",
+    answers: [
+      { text: "1996", correct: false },
+      { text: "1995", correct: true },
+      { text: "1994", correct: false },
+      { text: "None of the above", correct: false }
+    ]
   }
 ];
 
-const questionEl = document.getElementById('question');
-const a_text = document.getElementById('a_text');
-const b_text = document.getElementById('b_text');
-const c_text = document.getElementById('c_text');
-const d_text = document.getElementById('d_text');
-const submitBtn = document.getElementById('submit');
-const answersEls = document.querySelectorAll('.answer');
-const resultEl = document.getElementById('result');
-const progressBar = document.getElementById('progress');
+const questionElement = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
+const scoreContainer = document.getElementById("score-container");
+const scoreElement = document.getElementById("score");
 
-let currentQuiz = 0;
+let currentQuestionIndex = 0;
 let score = 0;
 
-loadQuiz();
-
-function loadQuiz() {
-  deselectAnswers();
-  resultEl.innerText = "";
-  const currentQuizData = quizData[currentQuiz];
-  questionEl.innerText = currentQuizData.question;
-  a_text.innerText = currentQuizData.a;
-  b_text.innerText = currentQuizData.b;
-  c_text.innerText = currentQuizData.c;
-  d_text.innerText = currentQuizData.d;
-  updateProgressBar();
+function startQuiz() {
+  nextButton.innerHTML = "Next";
+  showQuestion();
 }
 
-function deselectAnswers() {
-  answersEls.forEach(answerEl => answerEl.checked = false);
-}
+function showQuestion() {
+  resetState();
+  let currentQuestion = questions[currentQuestionIndex];
+  questionElement.innerHTML = currentQuestion.question;
 
-function getSelected() {
-  let answer = undefined;
-  answersEls.forEach(answerEl => {
-    if (answerEl.checked) {
-      answer = answerEl.id;
+  currentQuestion.answers.forEach(answer => {
+    const button = document.createElement("button");
+    button.innerHTML = answer.text;
+    button.classList.add("answer-btn");
+    if (answer.correct) {
+      button.dataset.correct = answer.correct;
     }
+    button.addEventListener("click", selectAnswer);
+    answerButtons.appendChild(button);
   });
-  return answer;
 }
 
-function updateProgressBar() {
-  const progressPercent = (currentQuiz / quizData.length) * 100;
-  progressBar.style.width = `${progressPercent}%`;
-}
-
-submitBtn.addEventListener('click', () => {
-  const answer = getSelected();
-  if (!answer) {
-    resultEl.innerText = "Oops! Please pick an answer before moving on.";
-    return;
+function resetState() {
+  nextButton.classList.add("hide");
+  while (answerButtons.firstChild) {
+    answerButtons.removeChild(answerButtons.firstChild);
   }
-  if (answer === quizData[currentQuiz].correct) {
+}
+
+function selectAnswer(e) {
+  const selectedBtn = e.target;
+  const isCorrect = selectedBtn.dataset.correct === "true";
+
+  if (isCorrect) {
+    selectedBtn.classList.add("correct");
     score++;
+  } else {
+    selectedBtn.classList.add("wrong");
   }
 
-  currentQuiz++;
+  Array.from(answerButtons.children).forEach(button => {
+    if (button.dataset.correct === "true") {
+      button.classList.add("correct");
+    }
+    button.disabled = true;
+  });
 
-  if (currentQuiz < quizData.length) {
-    loadQuiz();
+  nextButton.classList.remove("hide");
+}
+
+function showScore() {
+  document.getElementById("question-container").classList.add("hide");
+  scoreContainer.classList.remove("hide");
+  scoreElement.innerText = `${score} / ${questions.length}`;
+
+  const resultHeading = document.getElementById("result-heading");
+
+  if (score >= questions.length * 0.75) {
+    resultHeading.innerText = "🎉 You're a Winner!";
+    scoreContainer.classList.add("winner");
   } else {
-    progressBar.style.width = `100%`;
-    resultEl.innerHTML = `Awesome! You got <strong>${score}</strong> out of <strong>${quizData.length}</strong> right.<br><button id="restart" onclick="location.reload()">Play Again?</button>`;
-    submitBtn.style.display = 'none';
+    resultHeading.innerText = "😢 Try Again!";
+    scoreContainer.classList.add("try-again");
+  }
+}
+
+function handleNextButton() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < questions.length) {
+    showQuestion();
+  } else {
+    showScore();
+  }
+}
+
+nextButton.addEventListener("click", () => {
+  if (currentQuestionIndex < questions.length) {
+    handleNextButton();
+  } else {
+    startQuiz();
   }
 });
+
+startQuiz();
